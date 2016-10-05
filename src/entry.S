@@ -138,6 +138,7 @@ common:
     pushq %rbp
     pushq %rsi
     pushq %rdi
+    cld
     movq %rsp, %rdi
     call c_handler
     popq %rdi

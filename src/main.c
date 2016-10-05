@@ -21,6 +21,7 @@ void main(void)
 
 	write_idtr(&ptr);
 
+	config_serial();
 	write_to_serial("OS has been started:\n");
 
 	setup_ints();
