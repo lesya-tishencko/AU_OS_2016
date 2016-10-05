@@ -27,9 +27,10 @@ void main(void)
 	enable_ints();
 
 
-	set_timer(100);
+	set_timer(1000);
 
 	__asm__ volatile("int $0" : : );
+        __asm__ volatile("int $33" : : );
 
 
 	while (1);

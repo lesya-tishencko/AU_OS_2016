@@ -7,8 +7,8 @@ static void config(unsigned offset)
 	out8(0x20, 1 | (1 << 4));
 	out8(0xA0, 1 | (1 << 4));
 
-	out8(0x21, 32);
-	out8(0xA1, 40);
+	out8(0x21, offset);
+	out8(0xA1, offset + 8);
 
 	out8(0x21, (1 << 2));
 	out8(0xA1, 2);
@@ -57,7 +57,8 @@ struct idt_entry {
 	uint16_t offset1;
 	uint16_t ss;
 	uint16_t flags;
-        uint32_t offset2;
+        uint16_t offset2;
+	uint64_t offset3;
 } __attribute__((packed));
 
 // from entry.S
@@ -70,7 +71,8 @@ static void set_idt_entry(int int_no, unsigned short cs, unsigned long offset,  
 	(descryptor_table + int_no)->offset1 = offset & 0xFFFFul;
 	(descryptor_table + int_no)->ss = cs;
 	(descryptor_table + int_no)->flags = flags;
-	(descryptor_table + int_no)->offset2 = offset & 0xFFFF0000ul;
+	(descryptor_table + int_no)->offset2 = (offset >> 16) & 0xFFFFul;
+	(descryptor_table + int_no)->offset3 = offset >> 32;
 }
 
 static void set_handler_addr(int no)
@@ -86,12 +88,11 @@ void c_handler(struct frame* frame) {
 	int int_no = frame->int_no;
 
 	if (int_no < 32) {
-		write_to_serial("Error code is: ");
-		write_to_serial("\n"); 
+		write_to_serial("Something error was happend\n");
 	}
 	else if (int_no == 32) {
 		write_to_serial( "i8254 PIT interrupt handler called\n" );
-		pic_eoi(0);
+		pic_eoi(int_no - 32);
 	}
 	else {
 		write_to_serial("Has been got intterupt from device\n");
@@ -110,7 +111,6 @@ void setup_ints(void)
 	set_idt(&idt_ptr);
 
 	config(32);
-
-	for (int i = 32; i < 35; ++i)
-		set(i - 32);
+	// set interrupt for timer
+	set(0);
 }
