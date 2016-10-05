@@ -103,9 +103,6 @@ void setup_ints(void)
 {
 	for (int i = 0; i < 35; ++i)
 		set_handler_addr(i);
-		
-	for (int i = 32; i < 35; ++i)
-		set(i - 32);
 
 	idt_ptr.size = sizeof(descryptor_table) - 1;
 	idt_ptr.base = (uint64_t)descryptor_table;
@@ -113,4 +110,7 @@ void setup_ints(void)
 	set_idt(&idt_ptr);
 
 	config(32);
+
+	for (int i = 32; i < 35; ++i)
+		set(i - 32);
 }
