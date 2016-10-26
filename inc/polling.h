@@ -2,6 +2,7 @@
 #define __POLLING_H__
 
 #include <ioport.h>
+#include <stddef.h>
 
 static inline void config_serial() {
    unsigned short s_port = 0x3f8;
@@ -17,6 +18,6 @@ static inline void config_serial() {
    out8(s_port + 3, 3); 
 }
 
-void write_to_serial(const char* data);
+void write_to_serial(const char* data, size_t size);
 
 #endif

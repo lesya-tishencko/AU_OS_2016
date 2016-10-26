@@ -88,14 +88,14 @@ void c_handler(struct frame* frame) {
 	int int_no = frame->int_no;
 
 	if (int_no < 32) {
-		write_to_serial("Something error was happend\n");
+		write_to_serial("Something error was happend\n", 25);
 	}
 	else if (int_no == 32) {
-		write_to_serial( "i8254 PIT interrupt handler called\n" );
+		write_to_serial( "i8254 PIT interrupt handler called\n", 37);
 		pic_eoi(int_no - 32);
 	}
 	else {
-		write_to_serial("Has been got intterupt from device\n");
+		write_to_serial("Has been got intterupt from device\n", 36);
 		pic_eoi(int_no - 32);
 	}
 }
