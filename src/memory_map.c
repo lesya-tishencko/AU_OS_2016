@@ -4,9 +4,11 @@
 
 extern uint64_t multiboot_info;
 extern uint32_t multiboot_header[];
+
+size_t memory_map_size = 0;
+multiboot_map_entry_t memory_map[MEMORY_MAP_MAX_SIZE];
  
 void setup_memory_map() {
-	memory_map_size = 0;
 	multiboot_header_t * mheader = (multiboot_header_t *)multiboot_header;
 	multiboot_info_t * minfo = (multiboot_info_t *)multiboot_info;
 	if (!((minfo->flags >> 6) & 1)) {
@@ -58,7 +60,7 @@ void setup_memory_map() {
 void print_memory_map() {
 	printf("Memory map: \n");
 	for (size_t i = 0; i < memory_map_size; i++) {
-		printf("size %p range [%p; %p] type %lld\n", memory_map[i].size, memory_map[i].addr, memory_map[i].addr + memory_map[i].len - 1, memory_map[i].type);
+		printf("range [%p; %p] type %lld\n", memory_map[i].addr, memory_map[i].addr + memory_map[i].len - 1, memory_map[i].type);
 	}
 }
 

@@ -16,8 +16,8 @@ struct multiboot_map_entry {
 
 typedef struct multiboot_map_entry multiboot_map_entry_t;
 
-size_t memory_map_size;
-multiboot_map_entry_t memory_map[MEMORY_MAP_MAX_SIZE];
+extern size_t memory_map_size;
+extern multiboot_map_entry_t memory_map[MEMORY_MAP_MAX_SIZE];
 
 struct multiboot_header {
 	uint32_t magic;

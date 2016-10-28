@@ -26,29 +26,37 @@ int get_order(uint64_t size) {
 		ord++;
 		pow <<= 1;
 	}
-
+	
 	return ord;
 }
 
 void create_buddy_list() {
+	uint64_t addr_border = 0xffffffff;
 	for (uint64_t i = 0; i < memory_map_size; ++i) {
 		multiboot_map_entry_t * entry = &memory_map[i];
-		if (entry->type != 1)
+		if (entry->type != 1 || entry->addr >= addr_border)
 			continue;
-		buddy_node_t * current = (buddy_node_t *)(entry->addr + VIRTUAL_BASE);
-		int ord = get_order(entry->len);
-		if (!created[ord - 1]) {
-			allocator[ord - 1].head = current;
-			list_init(allocator[ord - 1].head, NODE_UNUSED, ord);
-			allocator[ord - 1].last = allocator[ord - 1].head;
-			created[ord - 1] = 1;
+		uint64_t len_border = entry->addr + entry->len > addr_border ? addr_border - entry->addr : entry->len;
+		
+		uint64_t offset = 0;
+		while (len_border > offset) {
+			int ord = get_order(len_border - offset);
+			buddy_node_t * current = (buddy_node_t *)(entry->addr + offset + VIRTUAL_BASE);
+			if (!created[ord - 1]) {
+				allocator[ord - 1].head = current;
+				list_init(allocator[ord - 1].head, NODE_UNUSED, ord);
+				allocator[ord - 1].last = allocator[ord - 1].head;
+				created[ord - 1] = 1;
+				buddy_count++;
+			}
+			else {
+				list_init(current, NODE_UNUSED, ord);
+				list_push_back(allocator[ord - 1].last, current);
+				allocator[ord - 1].last = current;
+			}
 			buddy_count++;
-			continue;
+			offset += 1 << ord;
 		}
-		list_init(current, NODE_UNUSED, ord);
-		list_push_back(allocator[ord - 1].last, current);
-		allocator[ord - 1].last = current;
-		buddy_count++;
 	}
 	printf("Allocator is created. Firstly, we have %d blocks\n", buddy_count);
 }

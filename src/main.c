@@ -27,6 +27,8 @@ void main(void)
 	setup_memory_map();
 	print_memory_map();
 
+	qemu_gdb_hang();
+
 	create_buddy_list();
 
 
@@ -38,7 +40,6 @@ void main(void)
 	
 	free_buddy(a, 10);
 	free_buddy(b, 9);
-	qemu_gdb_hang();
 	free_buddy(c, 5);
 	free_buddy(d, 7);
 	free_buddy(e, 12);
