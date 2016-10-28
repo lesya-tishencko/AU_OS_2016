@@ -34,13 +34,12 @@ void create_buddy_list() {
 	uint64_t addr_border = 0xffffffff;
 	for (uint64_t i = 0; i < memory_map_size; ++i) {
 		multiboot_map_entry_t * entry = &memory_map[i];
-		if (entry->type != 1 || entry->addr >= addr_border)
+		if (entry->type != 1)
 			continue;
-		uint64_t len_border = entry->addr + entry->len > addr_border ? addr_border - entry->addr : entry->len;
 		
 		uint64_t offset = 0;
-		while (len_border > offset) {
-			int ord = get_order(len_border - offset);
+		while (entry->len > offset) {
+			int ord = get_order(entry->len - offset);
 			buddy_node_t * current = (buddy_node_t *)(entry->addr + offset + VIRTUAL_BASE);
 			if (!created[ord - 1]) {
 				allocator[ord - 1].head = current;
