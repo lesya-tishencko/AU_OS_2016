@@ -7,6 +7,7 @@
 #include <print.h>
 #include <ints.h>
 #include <time.h>
+#include <thread.h>
 
 static void qemu_gdb_hang(void)
 {
@@ -17,7 +18,26 @@ static void qemu_gdb_hang(void)
 #endif
 }
 
-static void test_kmap(void)
+void helloWorld(void *args) {
+    if (args == NULL)
+    	printf("Hello from thread!\n");
+    else
+        printf("Some arguments was here\n");
+    exit_thread();
+}
+
+static void test_thread(void) 
+{
+    struct thread_t first, second;
+
+    new_thread(&first, helloWorld, NULL);
+    new_thread(&second, helloWorld, NULL);
+
+    join_thread(&first);
+    join_thread(&second);
+}
+
+/*static void test_kmap(void)
 {
 	const size_t count = 1024;
 	struct page **pages = mem_alloc(sizeof(*pages) * count);
@@ -129,7 +149,7 @@ static void test_buddy(void)
 		list_del(&page->ll);
 		__page_free(page, 0);
 	}
-}
+}*/
 
 void main(void *bootstrap_info)
 {
@@ -144,13 +164,14 @@ void main(void *bootstrap_info)
 	mem_alloc_setup();
 	kmap_setup();
 	enable_ints();
+        scheduler_setup();
 
 	printf("Tests Begin\n");
-	test_buddy();
+        test_thread();
+	/*test_buddy();
 	test_slab();
 	test_alloc();
-	test_kmap();
+	test_kmap();*/
 	printf("Tests Finished\n");
-
 	while (1);
 }
